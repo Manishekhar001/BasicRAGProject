@@ -32,6 +32,7 @@ jobs:
             
             - name: Test Docker Image
               run : |
+               docker build -t rag-qa-system:latest .
                docker run --rm\
                 -e OPENAI_API_KEY=test-key\
                 -e QDRANT_URL=http://localhost:6333\
