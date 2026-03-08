@@ -75,4 +75,50 @@ jobs:
                 -e QDRANT_API_KEY=test-key \
                 rag-qa-system:latest python -c "from app.main import app; print('App loaded successfully')"
 
+    # ─────────────────────────────────────────
+    # JOB 3 — Deploy to EC2
+    # Only runs on push to main (not PRs).
+    # Only runs if docker_build_test passes.
+    # ─────────────────────────────────────────
+    deploy:
+        name: Deploy to EC2
+        runs-on: ubuntu-latest
+        needs: docker_build_test
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build and Push Image to Docker Hub
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ secrets.DOCKERHUB_USERNAME }}/rag-qa-system:latest
+
+            - name: Deploy to EC2
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USERNAME }}
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  script: |
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/rag-qa-system:latest
+                      docker stop rag-qa-system || true
+                      docker rm rag-qa-system || true
+                      docker run -d \
+                        --name rag-qa-system \
+                        --restart always \
+                        -p 8000:8000 \
+                        --env-file /home/ubuntu/.env \
+                        ${{ secrets.DOCKERHUB_USERNAME }}/rag-qa-system:latest
+                      docker image prune -f
+
                 
