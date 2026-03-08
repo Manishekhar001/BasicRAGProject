@@ -32,4 +32,4 @@ datasets
 ragas==0.3.7
 
 pytest
-unittest
+pytest-asyncio
