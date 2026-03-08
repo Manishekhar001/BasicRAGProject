@@ -73,7 +73,7 @@ def mock_embeddings():
 @pytest.fixture
 def mock_vector_store(mock_qdrant_client, mock_embeddings):
     """Mock vector store service."""
-    with patch("app.core.vector_store.VectorStoreService") as mock:
+    with patch("app.main.VectorStoreService") as mock:
         service = MagicMock()
         service.health_check.return_value = True
         service.get_collection_info.return_value = {
@@ -91,7 +91,7 @@ def mock_vector_store(mock_qdrant_client, mock_embeddings):
 @pytest.fixture
 def mock_rag_chain():
     """Mock RAG chain."""
-    with patch("app.api.routes.query.RAGChain") as mock:
+    with patch("app.main.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
 
@@ -119,7 +119,7 @@ def mock_rag_chain():
 @pytest.fixture
 def mock_rag_chain_with_evaluation():
     """Mock RAG chain with evaluation support."""
-    with patch("app.api.routes.query.RAGChain") as mock:
+    with patch("app.main.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
 
@@ -160,7 +160,7 @@ def mock_rag_chain_with_evaluation():
 @pytest.fixture
 def mock_rag_chain_with_evaluation_error():
     """Mock RAG chain with evaluation error."""
-    with patch("app.api.routes.query.RAGChain") as mock:
+    with patch("app.main.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
 
