@@ -120,5 +120,3 @@ jobs:
                         --env-file /home/ubuntu/.env \
                         ${{ secrets.DOCKERHUB_USERNAME }}/rag-qa-system:latest
                       docker image prune -f
-
-                
